@@ -1,0 +1,8 @@
+# depslib dependency file v1.0
+1544031104 source:d:\acm_template\barricade\main.cpp
+	<iostream>
+	<cstdio>
+	<cstring>
+	<algorithm>
+	<vector>
+

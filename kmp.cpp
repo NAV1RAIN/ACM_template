@@ -6,8 +6,8 @@ using namespace std;
 
 const int SIZE = 1e6+6;
 /*
- * NEXT[]�ĺ��壺x[i-NEXT[i]...i-1] = x[0...NEXT[i]-1]
- * NEXT[i]Ϊ���� x[i-z...i-1] = x[0...z-1] �����zֵ������x������ƥ�䣩
+ * NEXT[]的含义：x[i-NEXT[i]...i-1] = x[0...NEXT[i]-1]
+ * NEXT[i]为满足 x[i-z...i-1] = x[0...z-1] 的最大z值（就是x的自身匹配）
  */
 void kmp_pre(char x[], int m, int NEXT[]) {
     int i, j;
@@ -19,8 +19,8 @@ void kmp_pre(char x[], int m, int NEXT[]) {
     }
 }
 /*
- * kmpNEXT[i]����˼��NEXT[i] = NEXT[NEXT[...[NEXTp[i]]]]��ֱ��NEXT[i] < 0 ���� x[NEXT[i]] != x[i]��
- * ������Ԥ�������Կ�һЩ
+ * kmpNEXT[i]的意思：NEXT[i] = NEXT[NEXT[...[NEXTp[i]]]]（直到NEXT[i] < 0 或者 x[NEXT[i]] != x[i]）
+ * 这样的预处理可以快一些
  */
 void preKMP(char x[], int m, int kmpNEXT[]) {
     int i, j;
@@ -33,7 +33,7 @@ void preKMP(char x[], int m, int kmpNEXT[]) {
     }
 }
 /*
- * ���� x �� y �г��ֵĴ����������ص�
+ * 返回 x 在 y 中出现的次数，可以重叠
  */
 int NEXT[SIZE];
 int KMP_Count(char x[], int m, char y[], int n) {

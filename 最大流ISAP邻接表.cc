@@ -1,79 +1,100 @@
 #include <bits/stdc++.h>
 using namespace std;
 
-const int MAXN = 100010;  //点数的最大值
-const int MAXM = 400010;  //边数的最大值
+const int MAXN = 100005;
+const int MAXE = 1000005;
 const int INF = 0x3f3f3f3f;
+
 struct Edge {
-    int to, next, cap, flow;
-} edge[MAXM];  //注意是 MAXM
-int tol;
-int head[MAXN];
-int gap[MAXN], dep[MAXN], pre[MAXN], cur[MAXN];
+    int v;
+    int c;
+    int n;
+    Edge() {}
+    Edge(int v, int c, int n) : v(v), c(c), n(n) {}
+};
+
+Edge E[MAXE];
+int H[MAXN], cntE;
+int d[MAXN];
+int cur[MAXN];
+int pre[MAXN];
+int gap[MAXN];
+int s, t, nv, flow;  //s为起点，t为终点，nv为点的数量
+int Q[MAXN], head, tail;
+
 void init() {
-    tol = 0;
-    memset(head, -1, sizeof(head));
-}  //加边，单向图三个参数，双向图四个参数
-void addedge(int u, int v, int w, int rw = 0) {
-    edge[tol].to = v;
-    edge[tol].cap = w;
-    edge[tol].next = head[u];
-    edge[tol].flow = 0;
-    head[u] = tol++;
-    edge[tol].to = u;
-    edge[tol].cap = rw;
-    edge[tol].next = head[v];
-    edge[tol].flow = 0;
-    head[v] = tol++;
+    cntE = 0;
+    memset(H, -1, sizeof(H));
 }
-//输入参数：起点、终点、点的总数
-//点的编号没有影响，只要输入点的总数
-int sap(int start, int end, int N) {
+
+void addedge(int u, int v, int c, int r = 0) {
+    E[cntE] = Edge(v, c, H[u]);
+    H[u] = cntE++;
+    E[cntE] = Edge(u, r, H[v]);
+    H[v] = cntE++;
+}
+
+void revbfs() {
+    head = tail = 0;
+    memset(d, -1, sizeof(d));
     memset(gap, 0, sizeof(gap));
-    memset(dep, 0, sizeof(dep));
-    memcpy(cur, head, sizeof(head));
-    int u = start;
-    pre[u] = -1;
-    gap[0] = N;
-    int ans = 0;
-    while (dep[start] < N) {
-        if (u == end) {
-            int Min = INF;
-            for (int i = pre[u]; i != -1; i = pre[edge[i ^ 1].to])
-                if (Min > edge[i].cap - edge[i].flow) Min = edge[i].cap - edge[i].flow;
-            for (int i = pre[u]; i != -1; i = pre[edge[i ^ 1].to]) {
-                edge[i].flow += Min;
-                edge[i ^ 1].flow = Min;
-            }
-            u = start;
-            ans += Min;
-            continue;
+    Q[tail++] = t;
+    d[t] = 0;
+    gap[d[t]] = 1;
+    while (head != tail) {
+        int u = Q[head++];
+        for (int i = H[u]; ~i; i = E[i].n) {
+            int v = E[i].v;
+            if (~d[v]) continue;
+            d[v] = d[u] + 1;
+            gap[d[v]]++;
+            Q[tail++] = v;
         }
-        bool flag = false;
-        int v;
-        for (int i = cur[u]; i != -1; i = edge[i].next) {
-            v = edge[i].to;
-            if (edge[i].cap - edge[i].flow && dep[v] + 1 == dep[u]) {
-                flag = true;
-                cur[u] = pre[v] = i;
-                break;
-            }
-        }
-        if (flag) {
-            u = v;
-            continue;
-        }
-        int Min = N;
-        for (int i = head[u]; i != -1; i = edge[i].next)
-            if (edge[i].cap - edge[i].flow && dep[edge[i].to] < Min) {
-                Min = dep[edge[i].to];
-                cur[u] = i;
-            }
-        gap[dep[u]]--;
-        if (!gap[dep[u]]) return ans;
-        dep[u] = Min + 1;
-        gap[dep[u]]++;
-        if (u != start) u = edge[pre[u] ^ 1].to;
     }
-    return ans;
+}
+
+int isap() {
+    memcpy(cur, H, sizeof cur);
+    flow = 0;
+    revbfs();
+    int u = pre[s] = s, i;
+    while (d[s] < nv) {
+        if (u == t) {
+            int f = INF;
+            for (i = s; i != t; i = E[cur[i]].v) {
+                if (f > E[cur[i]].c) {
+                    f = E[cur[i]].c;
+                    u = i;
+                }
+            }
+            flow += f;
+            for (i = s; i != t; i = E[cur[i]].v) {
+                E[cur[i]].c -= f;
+                E[cur[i] ^ 1].c += f;
+            }
+        }
+        for (i = cur[u]; ~i; i = E[i].n) {
+            int v = E[i].v;
+            if (E[i].c && d[u] == d[v] + 1) break;
+        }
+        if (~i) {
+            cur[u] = i;
+            pre[E[i].v] = u;
+            u = E[i].v;
+        } else {
+            if (0 == --gap[d[u]]) break;
+            int minv = nv;
+            for (int i = H[u]; ~i; i = E[i].n) {
+                int v = E[i].v;
+                if (E[i].c && minv > d[v]) {
+                    minv = d[v];
+                    cur[u] = i;
+                }
+            }
+            d[u] = minv + 1;
+            gap[d[u]]++;
+            u = pre[u];
+        }
+    }
+    return flow;
 }

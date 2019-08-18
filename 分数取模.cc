@@ -1,10 +1,10 @@
-//分数取模 模板
 #include <bits/stdc++.h>
 using namespace std;
-typedef long long ll;
+
+typedef long long LL;
 const int MOD = 998244353;
-ll fast_mod(ll a, ll b) { //快速幂
-    ll r = 1;
+LL fast_mod(LL a, LL b) {
+    LL r = 1;
     a %= MOD;
     while(b) {
         if(b & 1) r = (r*a) % MOD;
@@ -14,10 +14,10 @@ ll fast_mod(ll a, ll b) { //快速幂
     return r;
 }
 int main() {
-    ll a, b; // a 为分子， b 为分母
-    ll x = fast_mod(a, MOD-2);
-    ll ans = ((b%MOD)*(x%MOD))%MOD; // b为分母
-    printf("%lld\n", ans);
+    LL a, b;
+    LL x = fast_mod(a, MOD-2);
+    LL ans = ((b%MOD)*(x%MOD))%MOD;
+    printf("%LLd\n", ans);
     return 0;
 }
 

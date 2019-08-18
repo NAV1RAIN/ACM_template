@@ -40,3 +40,9 @@ int sap(int start, int end, int nodenum) {
     }
     return maxflow;
 }
+
+int main() {
+    freopen("RAW/in", "r", stdin);
+    freopen("RAW/out", "w", stdout);
+    return 0;
+}

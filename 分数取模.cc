@@ -20,4 +20,3 @@ int main() {
     printf("%LLd\n", ans);
     return 0;
 }
-
